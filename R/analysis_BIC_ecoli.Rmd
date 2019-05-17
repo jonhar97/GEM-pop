@@ -1,0 +1,57 @@
+---
+title: "Density"
+author: "Jon"
+date: "April 1, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(reshape2)
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r load data}
+BIC.GEM<-read.table("/mnt/powervault/jonhall/Desktop/Popstruct/Save/ExPEC/BIC_GEM.txt")
+BIC.SGEM<-read.table("/mnt/powervault/jonhall/Desktop/Popstruct/Save/ExPEC/BIC_SGEM.txt")
+BIC.SAGEM<-read.table("/mnt/powervault/jonhall/Desktop/Popstruct/Save/ExPEC/BIC_SAGEM.txt")
+BIC.DAGEM<-read.table("/mnt/powervault/jonhall/Desktop/Popstruct/Save/ExPEC/BIC_DAGEM.txt")
+xny<-cbind(BIC.GEM$V1[1:80],BIC.DAGEM$V1[1:80],BIC.SAGEM$V1,BIC.SGEM$V1[1:80])
+colnames(xny)<-c("GEM","DAGEM","SAGEM","SGEM")
+xny<-as.data.frame(xny)
+
+```
+
+## Including plots and analyses
+
+You can also embed plots, for example:
+
+```{r analysis, echo=FALSE}
+cat(sprintf('mean BIC GEM: %f (%f)\nmean BIC DAGEM: %f (%f)\nmean BIC SAGEM: %f (%f)\nmean BIC SGEM: %f (%f)\n',mean(xny$GEM),var(xny$GEM),mean(xny$DAGEM),var(xny$DAGEM),mean(xny$SAGEM),var(xny$SAGEM),mean(xny$SGEM),var(xny$SGEM)))
+wilcox.test(xny$GEM,xny$SGEM)
+wilcox.test(xny$GEM,xny$SAGEM)
+wilcox.test(xny$GEM,xny$DAGEM)
+xny<-as.data.frame(xny)
+mxny<-melt(xny)
+p<-ggplot(mxny,aes(x=value, fill=variable)) + geom_density(alpha=0.5); p
+p<-ggplot(mxny,aes(x=variable,y = value)) + geom_boxplot() +theme(axis.text=element_text(size=12,color="black"),axis.title=element_text(size=14,color="black"))+labs(y="BIC score",x=""); p
+postscript("/mnt/powervault/jonhall/Desktop/Popstruct/Save/ExPEC/boxplot_BIC.eps")
+p
+dev.off()
+pdf("/mnt/powervault/jonhall/Desktop/Popstruct/Save/ExPEC/boxplot_BIC.pdf")
+p
+dev.off()
+png("/mnt/powervault/jonhall/Desktop/Popstruct/Save/ExPEC/boxplot_BIC.png")
+p
+dev.off()
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

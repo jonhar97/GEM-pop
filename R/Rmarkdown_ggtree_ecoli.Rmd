@@ -1,0 +1,63 @@
+---
+title: "ggtree_ecoli"
+author: "Jon"
+date: "March 4, 2019"
+output: html_document
+---
+
+## Read libraries
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require("treeio")
+require("ggtree")
+require("ggplot2")
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+## Read tree and metadata
+
+```{r read tree}
+tree.121 <- read.newick("/mnt/powervault/jonhall/Desktop/Popstruct/data/e_coli/ecoli_121_v4.nwk")
+df <- read.table("/mnt/powervault/jonhall/Desktop/Popstruct/Save/ExPEC/aligned_Q_matrix_ExPEC.txt",sep="\t")
+rownames(df)<-df$name
+df<-df[,c(-1,-3,-4)]
+index <- which(df$Structure==10)
+df$Structure[index] <- 7
+index <- which(df$Structure==12)
+df$Structure[index] <- 8
+head(df)
+df$GEM<-as.factor(df$GEM)
+#df$DAGEM<-as.factor(df$DAGEM)
+#df$SAGEM<-as.factor(df$SAGEM)
+df$SGEM <- as.factor(df$SGEM)
+df$Structure <- as.factor(df$Structure)
+
+```
+
+
+## Create Plots
+
+You can also embed plots, for example:
+
+```{r heatmap, echo=FALSE}
+treeplot <- ggtree(tree.121)
+p <- gheatmap(treeplot, df, width = 0.1, color = "black") + theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=16)) +
+  scale_fill_manual(breaks = c("1", "2", "3", "4", "5", "6", "7", "8"), values = c("blue1","green1","yellow1","red1", "blue4", "green4", "orange","grey")) #+ 
+#geom_tiplab(size=3, align=TRUE) 
+p
+postscript("/mnt/powervault/jonhall/Desktop/Popstruct/Figures/tree_with_assignments.eps")
+p
+dev.off()
+png("/mnt/powervault/jonhall/Desktop/Popstruct/Figures/tree_with_assignments.png")
+p
+dev.off()
+#facet_plot(treeplot, 'heatmap', df, geom_tile, aes(x=as.numeric(as.factor(gene)), fill=type)) + theme_tree2(legend.position='right')
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

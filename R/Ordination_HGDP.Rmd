@@ -1,0 +1,160 @@
+---
+title: "MDSplot"
+author: "Jon"
+date: "March 29, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require("ggplot2")
+library("RColorBrewer")
+require("cowplot")
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r read data}
+#data <- read.table("/mnt/powervault/jonhall/Desktop/Popstruct/Save/HGDP/data_MDS.txt",header=T)
+data <- read.table("/mnt/powervault/jonhall/Desktop/Popstruct/Save/HGDP/metadata_tot_HGDP.txt",header=T)
+data$SGEM_tmp <- data$SGEM
+data$GEM_tmp <- data$GEM
+data$Admixture_tmp <- data$Admixture
+index <- which(data$SGEM_tmp==14)
+data$SGEM[index] <- 2
+index <- which(data$SGEM_tmp==13)
+data$SGEM[index] <- 10
+index <- which(data$SGEM_tmp==11)
+data$SGEM[index] <- 6
+index <- which(data$SGEM_tmp==9)
+data$SGEM[index] <- 1
+index <- which(data$SGEM_tmp==8)
+data$SGEM[index] <- 7
+index <- which(data$SGEM_tmp==7)
+data$SGEM[index] <- 8
+index <- which(data$SGEM_tmp==1)
+data$SGEM[index] <- 9
+index <- which(data$GEM_tmp==14)
+data$GEM[index] <- 2
+index <- which(data$GEM_tmp==11)
+data$GEM[index] <- 6
+index <- which(data$GEM_tmp==9)
+data$GEM[index] <- 1
+index <- which(data$GEM_tmp==8)
+data$GEM[index] <- 7
+index <- which(data$Admixture_tmp==14)
+data$Admixture[index] <- 2
+index <- which(data$Admixture_tmp==13)
+data$Admixture[index] <- 10
+index <- which(data$Admixture_tmp==11)
+data$Admixture[index] <- 6
+index <- which(data$Admixture_tmp==9)
+data$Admixture[index] <- 1
+index <- which(data$Admixture_tmp==8)
+data$Admixture[index] <- 7
+index <- which(data$Admixture_tmp==7)
+data$Admixture[index] <- 8
+index <- which(data$Admixture_tmp==1)
+data$Admixture[index] <- 9
+index <- which(data$Admixture_tmp==10)
+data$Admixture[index] <- 13
+index <- which(data$Admixture_tmp==6)
+data$Admixture[index] <- 11
+index <- which(data$Admixture_tmp==2)
+data$Admixture[index] <- 14
+
+data$SGEM <- as.factor(data$SGEM)
+data$GEM <- as.factor(data$GEM)
+data$Admixture <- factor(data$Admixture,levels=c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"))
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r plot, echo=FALSE}
+colourCount <- 15
+set3 <- colorRampPalette(brewer.pal('Set1',n=15))
+getPalette = colorRampPalette(brewer.pal(9, "Set1"))
+p <- ggplot(data = data, aes(y = MDS2, x = MDS1, col=Admixture,order=as.numeric(Admixture))) +
+ # geom_polygon(data=data,aes(x=MDS1,y=MDS2,fill=SGEM,group=SGEM),alpha=0.30) +
+ geom_point() +
+#  coord_cartesian(ylim=c(-0.02,0.05),xlim=c(0.01,0.1)) +
+# stat_ellipse(data=data,aes(y = MDS2, x = MDS1,group=SGEM)) +
+ theme_bw()+ 
+     scale_color_manual(values = setNames(set3(15), levels(data$Admixture)))#scale_colour_brewer(palette = 15)#scale_color_brewer(palette = getPalette(colourCount))#scale_colour_manual(values=colourCount) #+scale_fill_manual(values = getPalette(colourCount))
+p
+png("/mnt/powervault/jonhall/Desktop/Popstruct/Save/HGDP/ordination_overall.png")
+p
+dev.off()
+p2 <- ggplot(data = data, aes(y = MDS2, x = MDS1, shape=SGEM,col=Admixture,order=as.numeric(Admixture))) +
+  #geom_polygon(data=data,aes(x=MDS1,y=MDS2,fill=SGEM,group=GEM),alpha=0.30) +
+ geom_point() +
+  scale_shape_manual(values=seq(1,10)) +
+  coord_cartesian(ylim=c(-0.02,0.045),xlim=c(0.005,0.095)) +
+# stat_ellipse(data=data,aes(y = MDS2, x = MDS1,group=GEM)) +
+   theme(plot.margin = unit(c(15,1,1,1), "cm")) +
+ theme_bw()+ 
+     scale_color_manual(values = setNames(set3(15), levels(data$Admixture))); p2
+ png("/mnt/powervault/jonhall/Desktop/Popstruct/Save/HGDP/ordination_zoom_1_SGEM.png")
+p2
+dev.off()
+p25 <- ggplot(data = data, aes(y = MDS2, x = MDS1, shape=SGEM,col=Geographic.origin)) +
+  #geom_polygon(data=data,aes(x=MDS1,y=MDS2,fill=SGEM,group=GEM),alpha=0.30) +
+ geom_point() +
+  scale_shape_manual(values=seq(1,10)) +
+  coord_cartesian(ylim=c(-0.02,0.045),xlim=c(0.005,0.095)) +
+# stat_ellipse(data=data,aes(y = MDS2, x = MDS1,group=GEM)) +
+   theme(plot.margin = unit(c(15,1,1,1), "cm")) +
+ theme_bw()+ 
+     scale_color_manual(values = setNames(set3(27), levels(data$Geographic.origin))); p25
+ png("/mnt/powervault/jonhall/Desktop/Popstruct/Save/HGDP/ordination_zoom_1_Population.png")
+p25
+dev.off()
+p3 <- ggplot(data = data, aes(y = MDS2, x = MDS1, col=Geographic.area)) +
+ # geom_polygon(data=data,aes(x=MDS1,y=MDS2,fill=SGEM,group=SGEM),alpha=0.30) +
+ geom_point() +
+#  coord_cartesian(ylim=c(-0.02,0.05),xlim=c(0.01,0.1)) +
+# stat_ellipse(data=data,aes(y = MDS2, x = MDS1,group=SGEM)) +
+ theme_bw()+ 
+     scale_color_manual(values = setNames(set3(15), levels(data$Geographic.area)))#scale_colour_brewer(palette = 15)#scale_color_brewer(palette = getPalette(colourCount))#scale_colour_manual(values=colourCount) #+scale_fill_manual(values = getPalette(colourCount))
+p3
+ png("/mnt/powervault/jonhall/Desktop/Popstruct/Save/HGDP/ordination_area.png")
+p3
+dev.off()
+p4 <- ggplot(data = data, aes(y = MDS2, x = MDS1, shape=SGEM,col=Admixture,order=as.numeric(Admixture))) +
+  #geom_polygon(data=data,aes(x=MDS1,y=MDS2,fill=SGEM,group=GEM),alpha=0.30) +
+ geom_point() +
+  scale_shape_manual(values=seq(1,10)) +
+  coord_cartesian(ylim=c(0.075,0.115),xlim=c(-0.13,-0.1)) +
+# stat_ellipse(data=data,aes(y = MDS2, x = MDS1,group=GEM)) +
+   theme(plot.margin = unit(c(15,1,10,1), "cm")) +
+ theme_bw()+ 
+     scale_color_manual(values = setNames(set3(15), levels(data$Admixture))); p4
+ png("/mnt/powervault/jonhall/Desktop/Popstruct/Save/HGDP/ordination_zoom_2_SGEM.png")
+p4
+dev.off()
+p5 <- ggplot(data = data, aes(y = MDS2, x = MDS1, col=Geographic.origin)) +
+  #geom_polygon(data=data,aes(x=MDS1,y=MDS2,fill=SGEM,group=GEM),alpha=0.30) +
+ geom_point() +
+#  scale_shape_manual(values=seq(1,10)) +
+  coord_cartesian(ylim=c(0.075,0.115),xlim=c(-0.13,-0.1)) +
+# stat_ellipse(data=data,aes(y = MDS2, x = MDS1,group=GEM)) +
+   theme(plot.margin = unit(c(15,1,10,1), "cm")) +
+ theme_bw()+ 
+     scale_color_manual(values = setNames(set3(27), levels(data$Geographic.origin))); p5
+ png("/mnt/powervault/jonhall/Desktop/Popstruct/Save/HGDP/ordination_zoom_2_population.png")
+p5
+dev.off()
+p4 <- p4 + theme(legend.position = "none",legend.title = element_blank()) 
+p6 <- plot_grid(p3, p2, p4,labels = "AUTO"); p6
+png("/mnt/powervault/jonhall/Desktop/Popstruct/Save/HGDP/ordination_combined.png")
+p6
+dev.off()
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
